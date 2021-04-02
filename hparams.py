@@ -82,15 +82,23 @@ defaults = {
     'mask_padding':True  # set model's padded outputs to padded values
 }
 
-def create_hparams(hparams_string=None, verbose=False):
+def add_hparams(parser):
     """Create model hyperparameters. Parse nondefault from given string."""
 
+    hparams_group = parser.add_argument_group('hparams')
+    for key, default in defaults.items():
+        hparams_group.add_argument("--{}".format(key), type=type(default), default=default)
+
+
+if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.set_defaults(**defaults)
-    if hparams_string:
-        hparams = parser.parse_args(hparams_string)
-    else:
-        hparams = parser.parse_args()
+    hparams_group = parser.add_argument_group('hparams')
+    for key, default in defaults.items():
+        hparams_group.add_argument("--{}".format(key), type=type(default), default=default)
 
 
-    return hparams
+    argas = parser.parse_args()
+    hparams = hparams_group.parse_args()
+    print(hparams)
+    print("############################")
+    print(argas)
