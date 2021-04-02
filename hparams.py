@@ -15,7 +15,7 @@ defaults = {
     'dist_url':"tcp://localhost:54321",
     'cudnn_enabled':True,
     'cudnn_benchmark':False,
-    'ignore_layers':['embedding.weight'],
+    'ignore_layers':"['embedding.weight']",
 
     ################################
     # Data Parameters             #
@@ -23,7 +23,7 @@ defaults = {
     'load_mel_from_disk':False,
     'training_files':'filelists/train_filelist.txt',
     'validation_files':'filelists/val_filelist.txt',
-    'text_cleaners':['korean_cleaners'],
+    'text_cleaners':"['korean_cleaners']",
 
     ################################
     # Audio Parameters             #
@@ -82,6 +82,18 @@ defaults = {
     'mask_padding':True  # set model's padded outputs to padded values
 }
 
+def get_hparams(args, parser):
+    arg_groups = {}
+    for group in parser._action_groups:
+        group_dict = {a.dest: getattr(args, a.dest, None) for a in group._group_actions}
+        arg_groups[group.title] = argparse.Namespace(**group_dict)
+    ###################
+    hparams = arg_groups['hparams']
+    hparams.text_cleaners = eval(hparams.text_cleaners)
+    hparams.ignore_layers = eval(hparams.ignore_layers)
+
+    return hparams
+
 def add_hparams(parser):
     """Create model hyperparameters. Parse nondefault from given string."""
 
@@ -95,10 +107,17 @@ if __name__ == "__main__":
     hparams_group = parser.add_argument_group('hparams')
     for key, default in defaults.items():
         hparams_group.add_argument("--{}".format(key), type=type(default), default=default)
+    args = parser.parse_args()
 
+    arg_groups = {}
+    for group in parser._action_groups:
+        group_dict = {a.dest: getattr(args, a.dest, None) for a in group._group_actions}
+        arg_groups[group.title] = argparse.Namespace(**group_dict)
+    ###################
+    hparams = arg_groups['hparams']
 
-    argas = parser.parse_args()
-    hparams = hparams_group.parse_args()
     print(hparams)
+    print(type(hparams.text_cleaners))
+    print(type(eval(hparams.text_cleaners)))
     print("############################")
-    print(argas)
+    print(args)

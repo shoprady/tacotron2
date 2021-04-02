@@ -14,7 +14,7 @@ from model import Tacotron2
 from data_utils import TextMelLoader, TextMelCollate
 from loss_function import Tacotron2Loss
 from logger import Tacotron2Logger
-from hparams import add_hparams
+from hparams import add_hparams, get_hparams
 
 
 def reduce_tensor(tensor, n_gpus):
@@ -257,9 +257,9 @@ def train(output_directory, log_directory, checkpoint_path, warm_start, n_gpus,
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('-o', '--output_directory', type=str,
+    parser.add_argument('-o', '--output_directory', type=str, required=True,
                         help='directory to save checkpoints')
-    parser.add_argument('-l', '--log_directory', type=str,
+    parser.add_argument('-l', '--log_directory', type=str, required=True,
                         help='directory to save tensorboard logs')
     parser.add_argument('-c', '--checkpoint_path', type=str, default=None,
                         required=False, help='checkpoint path')
@@ -271,19 +271,11 @@ if __name__ == '__main__':
                         required=False, help='rank of current gpu')
     parser.add_argument('--group_name', type=str, default='group_name',
                         required=False, help='Distributed group name')
-    parser.add_argument('--hparams', type=str,
-                        required=False, help='comma separated name=value pairs')
 
     add_hparams(parser)
     args = parser.parse_args()
 
-    ##################
-    arg_groups = {}
-    for group in parser._action_groups:
-        group_dict = {a.dest: getattr(args, a.dest, None) for a in group._group_actions}
-        arg_groups[group.title] = argparse.Namespace(**group_dict)
-    ###################
-    hparams = arg_groups['hparams']
+    hparams = get_hparams(args, parser)
 
     torch.backends.cudnn.enabled = hparams.cudnn_enabled
     torch.backends.cudnn.benchmark = hparams.cudnn_benchmark
