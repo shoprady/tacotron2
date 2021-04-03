@@ -23,8 +23,8 @@ defaults = {
     'load_mel_from_disk':False,
     'training_files':'filelists/train_filelist.txt',
     'validation_files':'filelists/val_filelist.txt',
-    'text_cleaners':"['korean_cleaners']",
-
+    'text_cleaners':"['korean_cleaners']",  ##한글을 사용하려면 "['korean_cleaners']"   -> str 형태로 입력해야 함
+                                            ##영어를 사용하려면 "['english_cleaners']"
     ################################
     # Audio Parameters             #
     ################################
