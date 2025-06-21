@@ -75,18 +75,25 @@ class STFT(torch.nn.Module):
         self.register_buffer('inverse_basis', inverse_basis.float())
 
     def transform(self, input_data):
+        if input_data.dim() == 1:
+            input_data = input_data.unsqueeze(0).unsqueeze(0) # (T,) → (1, 1, T)
+        elif input_data.dim() == 2:
+            input_data = input_data.unsqueeze(1) # (1, T) → (1, 1, T)
+        elif input_data.dim() == 3 and input_data.size(1) != 1:
+            raise ValueError(f"Unexpected input_data shape: {input_data.shape}")
+        elif input_data.dim() != 3:
+            raise ValueError(f"Invalid input_data shape: {input_data.shape}")
+
         num_batches = input_data.size(0)
-        num_samples = input_data.size(1)
+        num_samples = input_data.size(2)
 
         self.num_samples = num_samples
 
         # similar to librosa, reflect-pad the input
-        input_data = input_data.view(num_batches, 1, num_samples)
         input_data = F.pad(
-            input_data.unsqueeze(1),
-            (int(self.filter_length / 2), int(self.filter_length / 2), 0, 0),
+            input_data,
+            (int(self.filter_length / 2), int(self.filter_length / 2)),
             mode='reflect')
-        input_data = input_data.squeeze(1)
 
         forward_transform = F.conv1d(
             input_data,
