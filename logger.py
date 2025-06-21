@@ -21,13 +21,13 @@ class Tacotron2Logger(SummaryWriter):
         #_, mel_outputs, gate_outputs, alignments = y_pred
         #mel_targets, gate_targets = y
 
+        # Removed plotting alignment and spectrograms to speed up logging
+        """
         # plot distribution of parameters
         for tag, value in model.named_parameters():
             tag = tag.replace('.', '/')
             self.add_histogram(tag, value.data.cpu().numpy(), iteration)
 
-        # Removed plotting alignment and spectrograms to speed up logging
-        """
         # plot alignment, mel target and predicted, gate target and predicted
         idx = random.randint(0, alignments.size(0) - 1)
         self.add_image(
