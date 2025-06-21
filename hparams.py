@@ -6,7 +6,7 @@ defaults = {
     # Experiment Parameters        #
     ################################
     'epochs':500,
-    'iters_per_checkpoint':10000,
+    'iters_per_checkpoint':10,
     'seed':1234,
     'dynamic_loss_scaling':True,
     'fp16_run':False,
